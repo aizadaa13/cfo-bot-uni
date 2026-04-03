@@ -1,43 +1,57 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CFO Bot</title>
+</head>
 <body>
+  <h1>CFO Bot - Cloud Cost Calculator</h1>
+  
+  <label>Instances: <input type="number" id="instances" value="0"></label><br>
+  <label>Storage (GB): <input type="number" id="storage" value="0"></label><br>
+  <label>Visitors: <input type="number" id="visitors" value="0"></label><br>
+  <label>DB Storage (GB): <input type="number" id="db" value="0"></label><br>
+  
+  <button onclick="calculate()">Calculate</button>
+  
+  <h2>Results:</h2>
+  <pre id="results"></pre>
 
-<h2>CFO Bot</h2>
+  <script>
+    function calculate() {
+      const H = 730;         // hours per month
+      const r = 0.05;        // compute per hour
+      const Ps = 0.08;       // storage per GB
+      const Pe = 0.09;       // network per GB
+      const Idb = 0.03;      // DB instance per hour
+      const Pdb = 0.10;      // DB storage per GB
+      const free_egress = 5; // GB free tier
 
-Instances: <input id="i"><br>
-Storage: <input id="s"><br>
-Users: <input id="u"><br>
-DB Storage: <input id="d"><br>
+      // Берём значения из полей
+      let n = Number(document.getElementById('instances').value);
+      let S = Number(document.getElementById('storage').value);
+      let visitors = Number(document.getElementById('visitors').value);
+      let Sdb = Number(document.getElementById('db').value);
 
-<button onclick="calc()">Calculate</button>
+      // Считаем egress из посетителей
+      let E = visitors * 2 / 1024; // GB
+      E = Math.max(0, E - free_egress);
 
-<p id="r"></p>
+      // Считаем компоненты
+      let compute_cost = n * r * H;
+      let storage_cost = S * Ps;
+      let network_cost = E * Pe;
+      let db_cost = Idb * H + Sdb * Pdb;
+      let total_cost = compute_cost + storage_cost + network_cost + db_cost;
 
-<script>
-function calc(){
-let n=i.value||0;
-let S=s.value||0;
-let u=u.value||0;
-let d=d.value||0;
-
-let H=720;
-let r=0.04;
-let Ps=0.025;
-let Pe=0.07;
-let Idb=0.02;
-let Pdb=0.08;
-
-let compute=n*r*H;
-let storage=S*Ps;
-let E=(u*3)/1024;
-let network=E<=10?0:(E-10)*Pe;
-let db=(Idb*H)+(d*Pdb);
-
-let total=compute+storage+network+db;
-
-r.innerHTML="Total: $"+total.toFixed(2);
-}
-</script>
-
+      // Выводим результат
+      document.getElementById('results').textContent =
+        `Compute Cost: $${compute_cost.toFixed(2)}\n` +
+        `Storage Cost: $${storage_cost.toFixed(2)}\n` +
+        `Network Cost: $${network_cost.toFixed(2)}\n` +
+        `Database Cost: $${db_cost.toFixed(2)}\n` +
+        `Total Cost: $${total_cost.toFixed(2)}`;
+    }
+  </script>
 </body>
 </html>
