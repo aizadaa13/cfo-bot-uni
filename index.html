@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h2>CFO Bot</h2>
+
+Instances: <input id="i"><br>
+Storage: <input id="s"><br>
+Users: <input id="u"><br>
+DB Storage: <input id="d"><br>
+
+<button onclick="calc()">Calculate</button>
+
+<p id="r"></p>
+
+<script>
+function calc(){
+let n=i.value||0;
+let S=s.value||0;
+let u=u.value||0;
+let d=d.value||0;
+
+let H=720;
+let r=0.04;
+let Ps=0.025;
+let Pe=0.07;
+let Idb=0.02;
+let Pdb=0.08;
+
+let compute=n*r*H;
+let storage=S*Ps;
+let E=(u*3)/1024;
+let network=E<=10?0:(E-10)*Pe;
+let db=(Idb*H)+(d*Pdb);
+
+let total=compute+storage+network+db;
+
+r.innerHTML="Total: $"+total.toFixed(2);
+}
+</script>
+
+</body>
+</html>
